@@ -1,0 +1,10 @@
+h1 {
+    color: #D4AF37;
+    font-family: 'Century Gothic', serif;
+}
+
+li {
+    list-style-type: none;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}

@@ -1,0 +1,10 @@
+{% extends 'shop/base.html' %} {% block title %}Каталог украшений{% endblock %}
+
+{% block content %}
+    <h1>Наши ювелирные изделия</h1>
+    <ul>
+        {% for item in products %}
+            <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

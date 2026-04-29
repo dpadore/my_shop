@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Ювелирный магазин{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'shop/style.css' %}">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/shop/">Главная</a>
+        </nav>
+        <hr>
+    </header>
+
+    {% block content %}
+    {% endblock %}
+
+    <footer>
+        <hr>
+        <p>&copy; 2026 Jewelry Shop</p>
+    </footer>
+</body>
+</html>
