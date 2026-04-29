@@ -1,10 +1,30 @@
-{% extends 'shop/base.html' %} {% block title %}Каталог украшений{% endblock %}
+{% extends 'shop/base.html' %}
+
+{% block title %}Главная | Monpans`e{% endblock %}
 
 {% block content %}
-    <h1>Наши ювелирные изделия</h1>
-    <ul>
-        {% for item in products %}
-            <li>{{ item }}</li>
-        {% endfor %}
-    </ul>
+<section style="text-align: center; padding: 60px 0;">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 36px; text-transform: uppercase;">Эстетика и качество</h1>
+    <p style="color: #666; font-weight: 300;">Откройте для себя коллекцию изысканных украшений</p>
+</section>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 40px;">
+    {% for product in products %}
+    <div style="text-align: left;">
+        <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; color: inherit;">
+            <div style="background: #f9f9f9; padding: 20px; margin-bottom: 15px;">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                {% else %}
+                    <span style="color: #ccc; font-family: 'Playfair Display';">MY_SHOP</span>
+                {% endif %}
+            </div>
+            <h3 style="font-family: 'Playfair Display', serif; font-size: 18px; margin: 0;">{{ product.title }}</h3>
+            <p style="color: #d4af37; font-weight: 500;">{{ product.base_price }} BYN</p>
+        </a>
+    </div>
+    {% empty %}
+    <p>Товары скоро появятся.</p>
+    {% endfor %}
+</div>
 {% endblock %}

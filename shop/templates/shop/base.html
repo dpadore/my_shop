@@ -4,22 +4,29 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Ювелирный магазин{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'shop/style.css' %}">
 </head>
 <body>
     <header>
-        <nav>
+        <div class="logo" style="font-size: 32px; letter-spacing: 8px;">Monpans`e</div>
+        <nav class="nav-menu">
             <a href="/shop/">Главная</a>
+            <a href="/catalog/">Каталог</a>
+            <a href="/about/">О нас</a>
+            <a href="/contacts/">Контакты</a>
+            <a href="/favorites/">Избранное</a>
+            <a href="/cart/">Корзина</a>
         </nav>
-        <hr>
     </header>
 
-    {% block content %}
-    {% endblock %}
+    <main class="container">
+        {% block content %}
+        {% endblock %}
+    </main>
 
-    <footer>
-        <hr>
-        <p>&copy; 2026 Jewelry Shop</p>
+    <footer style="margin-top: 60px; padding: 40px; border-top: 1px solid #eee; text-align: center; font-size: 12px; color: #888;">
+        &copy; 2026 Monpans`e. Ювелирные изделия и часы.
     </footer>
 </body>
 </html>

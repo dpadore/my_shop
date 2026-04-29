@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 class Category(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название категории")
+    slug = models.SlugField(max_length=100, unique=True, null=True, blank=True)
 
     class Meta:
         verbose_name = "Категория"
@@ -32,7 +33,7 @@ class Product(models.Model):
 
 class ProductVariant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants', verbose_name="Изделие")
-    size = models.DecimalField(max_digits=4, decimal_places=1, verbose_name="Размер")
+    size = models.DecimalField(max_digits=4, decimal_places=1, verbose_name="Размер", null=True)
     stock = models.PositiveIntegerField(default=0, verbose_name="Количество на складе")
 
     class Meta:
@@ -63,7 +64,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, verbose_name="Товар (размер)")
+    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, verbose_name="Товар (размер)", null=True)
     quantity = models.PositiveIntegerField(default=1, verbose_name="Количество")
     price_at_order = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена на момент заказа")
 

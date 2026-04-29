@@ -1,10 +1,74 @@
-h1 {
-    color: #D4AF37;
-    font-family: 'Century Gothic', serif;
+:root {
+    --gold: #d4af37;
+    --dark: #1a1a1a;
+    --light-grey: #f9f9f9;
+    --border: #eeeeee;
 }
 
-li {
-    list-style-type: none;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
+body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    color: var(--dark);
+    line-height: 1.6;
+}
+
+h1, h2, .logo {
+    font-family: 'Century Gothic', serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+header {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 0;
+    text-align: center;
+}
+
+.nav-menu {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+.nav-menu a {
+    text-decoration: none;
+    color: var(--dark);
+    transition: 0.3s;
+}
+
+.nav-menu a:hover {
+    color: var(--gold);
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 40px;
+    margin: 40px 0;
+}
+
+.product-card {
+    text-align: center;
+    transition: 0.3s;
+}
+
+.product-card img {
+    width: 100%;
+    height: auto;
+    background: var(--light-grey);
+}
+
+.price {
+    color: var(--gold);
+    font-weight: 500;
 }
