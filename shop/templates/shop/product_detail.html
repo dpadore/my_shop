@@ -18,8 +18,9 @@
         <p style="font-size: 24px; color: #d4af37; margin-bottom: 30px;">{{ product.base_price }} BYN</p>
 
         <div style="border-top: 1px solid #eee; padding-top: 20px;">
-            <p style="font-size: 14px; margin-bottom: 10px;"><strong>Материал:</strong> {{ product.material }}</p>
+            <p style="font-size: 14px; margin-bottom: 10px;"><strong>Материал:</strong> {{ product.get_material_display }}</p>
             <p style="font-size: 14px; margin-bottom: 10px;"><strong>Проба:</strong> {{ product.sample }}</p>
+            <p style="font-size: 14px; margin-bottom: 10px;"><strong>Вид вставки:</strong> {{ product.get_insertion_display }}</p>
             <p style="font-size: 14px; line-height: 1.8; color: #666;">{{ product.description }}</p>
         </div>
 

@@ -15,11 +15,36 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    MATERIAL_CHOICES = [
+        ('gold', 'Золото'),
+        ('rose gold', 'Розовое золото'),
+        ('white gold', 'Белое золото'),
+        ('silver', 'Серебро'),
+        ('platinum', 'Платина'),
+    ]
+
+    INSERT_CHOICES = [
+        ('diamond', 'Бриллиант'),
+        ('emerald', 'Изумруд'),
+        ('pearl', 'Жемчуг'),
+        ('none', 'Без вставки'),
+    ]
+    GENDER_CHOICES = [
+        ('women', 'Женщинам'),
+        ('men', 'Мужчинам'),
+        ('unisex', 'Унисекс'),
+    ]
+
+    insertion = models.CharField(max_length=30, choices=INSERT_CHOICES, blank=True, null=True, verbose_name="Вставка")
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default='women', verbose_name="Для кого")
+    material = models.CharField(max_length=30, choices=MATERIAL_CHOICES, blank=True, null=True, verbose_name="Материал")
+
+
+
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products', verbose_name="Категория")
     title = models.CharField(max_length=255, verbose_name="Название изделия")
     description = models.TextField(verbose_name="Описание")
     base_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Базовая цена")
-    material = models.CharField(max_length=100, verbose_name="Материал")
     sample = models.IntegerField(verbose_name="Проба")
     image = models.ImageField(upload_to='products/', null=True, blank=True, verbose_name="Изображение")
 

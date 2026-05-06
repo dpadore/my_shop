@@ -1,13 +1,13 @@
 {% extends 'shop/base.html' %}
 
-{% block title %}Каталог украшений | MY_SHOP{% endblock %}
+{% block title %}Каталог украшений | Monpans`e{% endblock %}
 
 {% block content %}
 <div style="display: flex; gap: 40px; margin-top: 40px;">
 
     <aside style="width: 200px; flex-shrink: 0;">
         <h3 style="font-family: 'Playfair Display', serif; text-transform: uppercase; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Категории</h3>
-        <ul style="list-style: none; padding: 0; margin-top: 20px; font-size: 14px; line-height: 2.5;">
+        <ul style="list-style: none; padding: 0; margin-top: 20px; font-size: 14px; line-height: 2.5; border-bottom: 1px solid #eee; padding-bottom: 20px;">
             <li>
                 <a href="{% url 'catalog' %}" style="text-decoration: none; color: {% if not category %}#d4af37{% else %}#1a1a1a{% endif %};">Все изделия</a>
             </li>
@@ -19,6 +19,64 @@
             </li>
             {% endfor %}
         </ul>
+
+        <form method="get" action="" style="margin-top: 30px;">
+            <h3 style="font-family: 'Playfair Display', serif; text-transform: uppercase; font-size: 14px; margin-bottom: 20px;">Фильтры</h3>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 12px; color: #999; margin-bottom: 8px; text-transform: uppercase;">Сортировать</label>
+                <select name="sort" onchange="this.form.submit()" style="width: 100%; padding: 8px; border: 1px solid #eee; font-size: 13px;">
+                    <option value="">По умолчанию</option>
+                    <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Сначала дешевле</option>
+                    <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Сначала дороже</option>
+                    <option value="name" {% if sort == 'name' %}selected{% endif %}>По названию</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+                <label style="display: block; font-size: 12px; color: #999; margin-bottom: 8px; text-transform: uppercase;">Цена (BYN)</label>
+                <div style="display: flex; gap: 5px;">
+                    <input type="number" name="min_price" value="{{ min_price|default:'' }}" placeholder="от" style="width: 50%; padding: 8px; border: 1px solid #eee; font-size: 13px;">
+                    <input type="number" name="max_price" value="{{ max_price|default:'' }}" placeholder="до" style="width: 50%; padding: 8px; border: 1px solid #eee; font-size: 13px;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+                <label style="display: block; font-size: 12px; color: #999; margin-bottom: 10px; text-transform: uppercase;">Металл</label>
+                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                    <label style="cursor: pointer;"><input type="checkbox" name="materials" value="gold" {% if 'gold' in selected_materials %}checked{% endif %} onchange="this.form.submit()"> Золото</label>
+                    <label style="cursor: pointer;"><input type="checkbox" name="materials" value="rose gold" {% if 'rose gold' in selected_materials %}checked{% endif %} onchange="this.form.submit()"> Розовое золото</label>
+                    <label style="cursor: pointer;"><input type="checkbox" name="materials" value="white gold" {% if 'white gold' in selected_materials %}checked{% endif %} onchange="this.form.submit()"> Белое золото</label>
+                    <label style="cursor: pointer;"><input type="checkbox" name="materials" value="silver" {% if 'silver' in selected_materials %}checked{% endif %} onchange="this.form.submit()"> Серебро</label>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+                <label style="display: block; font-size: 12px; color: #999; margin-bottom: 10px; text-transform: uppercase;">Вставка</label>
+                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                    <label style="cursor: pointer;"><input type="checkbox" name="inserts" value="diamond" {% if 'diamond' in selected_inserts %}checked{% endif %} onchange="this.form.submit()"> Бриллиант</label>
+                    <label style="cursor: pointer;"><input type="checkbox" name="inserts" value="pearl" {% if 'pearl' in selected_inserts %}checked{% endif %} onchange="this.form.submit()"> Жемчуг</label>
+                    <label style="cursor: pointer;"><input type="checkbox" name="inserts" value="none" {% if 'none' in selected_inserts %}checked{% endif %} onchange="this.form.submit()"> Без вставки</label>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; font-size: 12px; color: #999; margin-bottom: 10px; text-transform: uppercase;">Для кого</label>
+                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                    <label style="cursor: pointer;"><input type="checkbox" name="genders" value="women" {% if 'women' in selected_genders %}checked{% endif %} onchange="this.form.submit()"> Женщинам</label>
+                    <label style="cursor: pointer;"><input type="checkbox" name="genders" value="men" {% if 'men' in selected_genders %}checked{% endif %} onchange="this.form.submit()"> Мужчинам</label>
+                </div>
+            </div>
+
+            <button type="submit" style="width: 100%; padding: 12px; background: #1a1a1a; color: #fff; border: none; font-size: 12px; text-transform: uppercase; cursor: pointer;">
+                Применить
+            </button>
+
+            <a href="{% if category %}{% url 'category_filter' category.slug %}{% else %}{% url 'catalog' %}{% endif %}"
+               style="display: block; text-align: center; margin-top: 15px; font-size: 11px; color: #999; text-decoration: none; text-transform: uppercase;">
+               Сбросить фильтры
+            </a>
+        </form>
     </aside>
 
     <section style="flex-grow: 1;">
@@ -31,13 +89,13 @@
 
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 30px;">
             {% for product in products %}
-            <div class="product-card" style="text-align: left;">
+            <div class="product-card">
                 <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; color: inherit;">
-                    <div style="background: #f9f9f9; padding: 30px; margin-bottom: 15px; position: relative;">
+                    <div style="background: #f9f9f9; height: 280px; display: flex; align-items: center; justify-content: center; padding: 20px; margin-bottom: 15px;">
                         {% if product.image %}
                             <img src="{{ product.image.url }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                         {% else %}
-                            <span style="color: #ccc; font-family: 'Playfair Display';">MY_SHOP</span>
+                            <span style="color: #ccc; font-family: 'Playfair Display';">Monpans`e</span>
                         {% endif %}
                     </div>
                     <h4 style="font-family: 'Playfair Display', serif; font-size: 16px; margin: 0; font-weight: 400;">{{ product.title }}</h4>
