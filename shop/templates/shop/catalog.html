@@ -6,12 +6,15 @@
 <div style="display: flex; gap: 40px; margin-top: 40px;">
 
     <aside style="width: 200px; flex-shrink: 0;">
+
         <h3 style="font-family: 'Playfair Display', serif; text-transform: uppercase; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Категории</h3>
+
         <ul style="list-style: none; padding: 0; margin-top: 20px; font-size: 14px; line-height: 2.5; border-bottom: 1px solid #eee; padding-bottom: 20px;">
             <li>
                 <a href="{% url 'catalog' %}" style="text-decoration: none; color: {% if not category %}#d4af37{% else %}#1a1a1a{% endif %};">Все изделия</a>
             </li>
             {% for cat in categories %}
+
             <li>
                 <a href="{% url 'category_filter' cat.slug %}" style="text-decoration: none; color: {% if category.id == cat.id %}#d4af37{% else %}#1a1a1a{% endif %};">
                     {{ cat.name }}
@@ -80,32 +83,54 @@
     </aside>
 
     <section style="flex-grow: 1;">
-        <header style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: baseline;">
-            <h2 style="font-family: 'Playfair Display', serif; font-size: 28px;">
-                {% if category %}{{ category.name }}{% else %}Весь каталог{% endif %}
-            </h2>
-            <span style="font-size: 12px; color: #999;">Найдено: {{ products.count }}</span>
-        </header>
+    <div style="margin-bottom: 20px;">
+        <form method="get" action="{% url 'catalog' %}" style="display: flex; border: 1px solid #eee; padding: 2px;">
+            <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Поиск украшений..."
+                   style="flex-grow: 1; border: none; padding: 12px 15px; font-size: 14px; outline: none; font-family: 'Montserrat', sans-serif;">
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 30px;">
-            {% for product in products %}
-            <div class="product-card">
-                <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; color: inherit;">
-                    <div style="background: #f9f9f9; height: 280px; display: flex; align-items: center; justify-content: center; padding: 20px; margin-bottom: 15px;">
-                        {% if product.image %}
-                            <img src="{{ product.image.url }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                        {% else %}
-                            <span style="color: #ccc; font-family: 'Playfair Display';">Monpans`e</span>
-                        {% endif %}
-                    </div>
-                    <h4 style="font-family: 'Playfair Display', serif; font-size: 16px; margin: 0; font-weight: 400;">{{ product.title }}</h4>
-                    <p style="color: #d4af37; font-size: 15px; margin: 5px 0;">{{ product.base_price }} BYN</p>
-                </a>
-            </div>
-            {% empty %}
-            <p style="grid-column: 1/-1; text-align: center; color: #999; padding: 100px 0;">В данной категории пока нет украшений.</p>
-            {% endfor %}
+            {% for metal in selected_materials %}<input type="hidden" name="materials" value="{{ metal }}">{% endfor %}
+            {% for insert in selected_inserts %}<input type="hidden" name="inserts" value="{{ insert }}">{% endfor %}
+            {% for gender in selected_genders %}<input type="hidden" name="genders" value="{{ gender }}">{% endfor %}
+            {% if sort %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
+
+            <button type="submit" style="background: #1a1a1a; color: #fff; border: none; padding: 0 25px; cursor: pointer; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">
+                Найти
+            </button>
+        </form>
+    </div>
+
+    <header style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: baseline;">
+        <h2 style="font-family: 'Playfair Display', serif; font-size: 28px; margin: 0;">
+            {% if query %}
+                Результаты поиска: «{{ query }}»
+            {% elif category %}
+                {{ category.name }}
+            {% else %}
+                Весь каталог
+            {% endif %}
+        </h2>
+        <span style="font-size: 12px; color: #999;">Найдено: {{ products.count }}</span>
+    </header>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 30px;">
+        {% for product in products %}
+        <div class="product-card">
+            <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; color: inherit;">
+                <div style="background: #f9f9f9; height: 280px; display: flex; align-items: center; justify-content: center; padding: 20px; margin-bottom: 15px;">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                    {% else %}
+                        <span style="color: #ccc; font-family: 'Playfair Display';">Monpans`e</span>
+                    {% endif %}
+                </div>
+                <h4 style="font-family: 'Playfair Display', serif; font-size: 16px; margin: 0; font-weight: 400;">{{ product.title }}</h4>
+                <p style="color: #d4af37; font-size: 15px; margin: 5px 0;">{{ product.base_price }} BYN</p>
+            </a>
         </div>
-    </section>
+        {% empty %}
+        <p style="grid-column: 1/-1; text-align: center; color: #999; padding: 100px 0;">К сожалению, ничего не нашлось.</p>
+        {% endfor %}
+    </div>
+</section>
 </div>
 {% endblock %}

@@ -27,13 +27,17 @@ def catalog(request, category_slug=None):
     categories = Category.objects.all()
     products = Product.objects.all()
 
+    query = request.GET.get('q')
+    if query:
+        products = products.filter(title__iregex=query)
+
 # категория
 
     if category_slug:
         category = get_object_or_404(Category, slug=category_slug)
         products = products.filter(category=category)
 
-# материал
+# материал, вставка, пол
 
     selected_materials = request.GET.getlist('materials')
     selected_inserts = request.GET.getlist('inserts')
@@ -62,6 +66,7 @@ def catalog(request, category_slug=None):
         'category': category,
         'categories': categories,
         'products': products,
+        'query': query,
         'selected_materials': selected_materials,
         'selected_inserts': selected_inserts,
         'selected_genders': selected_genders,
