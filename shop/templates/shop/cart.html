@@ -1,7 +1,67 @@
 {% extends 'shop/base.html' %}
+
+{% block title %}Корзина | Monpans`e{% endblock %}
+
 {% block content %}
-<h1 style="font-family: 'Playfair Display'; text-align: center; margin-top: 50px;">Ваша корзина пока пуста</h1>
-<div style="text-align: center; margin-top: 20px;">
-    <a href="{% url 'catalog' %}" style="color: #d4af37; text-decoration: none; border-bottom: 1px solid;">Вернуться к покупкам</a>
+<div style="max-width: 1000px; margin: 40px auto; padding: 0 20px;">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 32px; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+        Ваша корзина
+    </h1>
+
+    {% if cart_items %}
+        <div style="display: grid; grid-template-columns: 1fr 300px; gap: 40px;">
+
+            <div>
+                {% for item in cart_items %}
+                <div style="display: flex; gap: 20px; padding: 20px 0; border-bottom: 1px solid #f5f5f5; align-items: center;">
+                    <div style="width: 100px; height: 100px; background: #f9f9f9; display: flex; align-items: center; justify-content: center;">
+                        {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                        {% else %}
+                            <span style="font-size: 10px; color: #ccc;">Monpans`e</span>
+                        {% endif %}
+                    </div>
+
+                    <div style="flex-grow: 1;">
+                        <h3 style="font-family: 'Playfair Display', serif; font-size: 18px; margin: 0;">{{ item.product.title }}</h3>
+                        <p style="color: #999; font-size: 13px; margin: 5px 0;">Материал: {{ item.product.get_material_display }}</p>
+                        <p style="font-weight: bold; margin-top: 10px;">{{ item.product.base_price }} BYN</p>
+                    </div>
+
+                    <div style="text-align: right;">
+                        <div style="font-size: 14px; margin-bottom: 10px;">Кол-во: <strong>{{ item.quantity }}</strong></div>
+                        <a href="{% url 'remove_from_cart' item.id %}" style="color: #ff4d4d; font-size: 12px; text-decoration: none; text-transform: uppercase; border-bottom: 1px solid transparent;" onmouseover="this.style.borderBottom='1px solid #ff4d4d'" onmouseout="this.style.borderBottom='none'">
+                            Удалить
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <aside>
+                <div style="background: #fdfdfd; border: 1px solid #eee; padding: 25px; position: sticky; top: 20px;">
+                    <h3 style="font-family: 'Playfair Display', serif; margin-top: 0;">Итого</h3>
+                    <div style="display: flex; justify-content: space-between; margin: 20px 0; font-size: 18px; font-weight: bold;">
+                        <span>К оплате:</span>
+                        <span style="color: #d4af37;">{{ total_price }} BYN</span>
+                    </div>
+                    <a href="{% url 'checkout' %}" style="display: block; width: 100%; padding: 15px 0; background: #1a1a1a; color: #fff; text-align: center; text-decoration: none; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; transition: 0.3s;" onmouseover="this.style.background='#333'" onmouseout="this.style.background='#1a1a1a'">
+                        Оформить заказ
+                    </a>
+                    <a href="{% url 'catalog' %}" style="display: block; text-align: center; margin-top: 15px; font-size: 12px; color: #999; text-decoration: none;">
+                        Продолжить покупки
+                    </a>
+                </div>
+            </aside>
+
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 100px 0;">
+            <p style="color: #999; font-size: 18px;">В вашей корзине пока ничего нет.</p>
+            <a href="{% url 'catalog' %}" style="display: inline-block; margin-top: 20px; padding: 12px 30px; background: #1a1a1a; color: #fff; text-decoration: none; text-transform: uppercase; font-size: 12px;">
+                Перейти в каталог
+            </a>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

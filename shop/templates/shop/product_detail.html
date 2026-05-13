@@ -24,9 +24,15 @@
             <p style="font-size: 14px; line-height: 1.8; color: #666;">{{ product.description }}</p>
         </div>
 
-        <button style="margin-top: 40px; width: 100%; padding: 15px; background: #1a1a1a; color: white; border: none; text-transform: uppercase; letter-spacing: 2px; cursor: pointer;">
-            В корзину
-        </button>
+<!--        <button style="margin-top: 40px; width: 100%; padding: 15px; background: #1a1a1a; color: white; border: none; text-transform: uppercase; letter-spacing: 2px; cursor: pointer;">-->
+<!--            В корзину-->
+<!--        </button>-->
+        <a href="{% url 'add_to_cart' product.id %}"
+       style="display: block; text-align: center; padding: 10px; background: #d4af37; color: #fff; text-decoration: none; font-size: 12px; text-transform: uppercase; margin-top: 10px; transition: 0.3s;"
+       onmouseover="this.style.background='#b8962d'"
+       onmouseout="this.style.background='#d4af37'">
+        В корзину
+    </a>
     </div>
 </div>
 {% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Мой профиль | Monpans`e{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 80px auto; padding: 40px; text-align: center; border: 1px solid #eee; background: #fff;">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 32px; margin-bottom: 20px;">Личный кабинет</h1>
+    <p style="color: #999; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">Добро пожаловать, {{ user.profile.full_name|default:user.username }}!</p>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
+
+    <div style="text-align: left; font-size: 15px; color: #333;">
+        <p><strong>Логин:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+    </div>
+
+    <a href="{% url 'catalog' %}" style="display: inline-block; margin-top: 30px; padding: 12px 25px; background: #1a1a1a; color: #fff; text-decoration: none; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Вернуться к покупкам</a>
+</div>
+{% endblock %}

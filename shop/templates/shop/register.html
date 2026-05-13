@@ -1,0 +1,70 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Регистрация | Monpans`e{% endblock %}
+
+{% block content %}
+<div style="max-width: 450px; margin: 60px auto; padding: 40px; border: 1px solid #eee; background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.02);">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 28px; text-align: center; margin-bottom: 10px;">Создать аккаунт</h1>
+    <p style="text-align: center; color: #999; font-size: 13px; margin-bottom: 30px;">Присоединяйтесь к сообществу Monpans`e</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="padding: 12px; margin-bottom: 20px; background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; font-size: 13px; text-align: center;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" action="{% url 'register' %}" style="display: flex; flex-direction: column; gap: 18px;">
+        {% csrf_token %}
+
+        <div>
+            <label style="display: block; font-size: 11px; color: #999; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Логин</label>
+            <input type="text" name="username" required placeholder="Например, ivan_ivanov"
+                   style="width: 100%; padding: 12px; border: 1px solid #ddd; outline: none; font-family: 'Montserrat', sans-serif; box-sizing: border-box;">
+        </div>
+
+        <div>
+            <label style="display: block; font-size: 11px; color: #999; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Ваше имя и фамилия</label>
+            <input type="text" name="full_name" required placeholder="Иван Иванов"
+                   style="width: 100%; padding: 12px; border: 1px solid #ddd; outline: none; font-family: 'Montserrat', sans-serif; box-sizing: border-box;">
+        </div>
+
+        <div>
+            <label style="display: block; font-size: 11px; color: #999; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Электронная почта</label>
+            <input type="email" name="email" required placeholder="example@mail.com"
+                   style="width: 100%; padding: 12px; border: 1px solid #ddd; outline: none; font-family: 'Montserrat', sans-serif; box-sizing: border-box;">
+        </div>
+
+        <div>
+            <label style="display: block; font-size: 11px; color: #999; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Придумайте пароль</label>
+            <input type="password" name="pass1" required
+                   style="width: 100%; padding: 12px; border: 1px solid #ddd; outline: none; box-sizing: border-box;">
+        </div>
+
+        <div>
+            <label style="display: block; font-size: 11px; color: #999; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Повторите пароль</label>
+            <input type="password" name="pass2" required
+                   style="width: 100%; padding: 12px; border: 1px solid #ddd; outline: none; box-sizing: border-box;">
+        </div>
+
+        <button type="submit" style="background: #1a1a1a; color: #fff; padding: 16px; border: none; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.3s; margin-top: 10px; font-weight: 400; font-family: 'Montserrat', sans-serif;">
+            Зарегистрироваться
+        </button>
+    </form>
+
+    <p style="text-align: center; margin-top: 30px; font-size: 13px; color: #999;">
+        Уже есть аккаунт? <a href="{% url 'login' %}" style="color: #1a1a1a; text-decoration: underline; font-weight: 500;">Войти</a>
+    </p>
+</div>
+
+<style>
+    button:hover {
+        background: #333 !important;
+        letter-spacing: 3px !important;
+    }
+    input:focus {
+        border-color: #1a1a1a !important;
+    }
+</style>
+{% endblock %}
