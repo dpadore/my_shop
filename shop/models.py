@@ -95,12 +95,13 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
-# корзина + избранное
+# корзина
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="carts", verbose_name="Корзина")
     session_key = models.CharField(max_length=40, null=True, blank=True, verbose_name="Ключ сессии")
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Товар")
+    variant = models.ForeignKey(ProductVariant, on_delete=models.SET_NULL, null=True, blank=True,verbose_name="Размер/Вариант")
     quantity = models.PositiveIntegerField(default=1, verbose_name="Количество")
     added_at = models.DateTimeField(auto_now_add=True)
 
@@ -109,7 +110,8 @@ class Cart(models.Model):
         verbose_name_plural = "Корзины"
 
     def __str__(self):
-        return f"{self.product.title} ({self.quantity})"
+        size_info = f" (Размер: {self.variant.size})" if self.variant else ""
+        return f"{self.product.title}{size_info} — {self.quantity} шт."
 
 
 class Favorite(models.Model):
@@ -136,7 +138,7 @@ class Order(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Аккаунт")
 
-    # Данные из формы заказа (на случай если профиля нет или данные другие)
+    # на случай если профиля нет или данные другие
     full_name = models.CharField(max_length=255, verbose_name="ФИО получателя")
     phone = models.CharField(max_length=20, verbose_name="Контактный телефон")
     address = models.TextField(verbose_name="Адрес доставки")

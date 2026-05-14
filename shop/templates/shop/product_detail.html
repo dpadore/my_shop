@@ -2,11 +2,11 @@
 
 {% block content %}
 <div style="display: flex; gap: 80px; margin-top: 40px; align-items: start;">
-    <div style="flex: 1; background: #f9f9f9; height: 500px;">
+    <div style="flex: 1; background: #f9f9f9; height: 500px; display: flex; align-items: center; justify-content: center;">
         {% if product.image %}
-        <img src="{{ product.image.url }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+            <img src="{{ product.image.url }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
         {% else %}
-        <span style="color: #ccc; font-family: 'Playfair Display';">MY_SHOP</span>
+            <span style="color: #ccc; font-family: 'Playfair Display';">MY_SHOP</span>
         {% endif %}
     </div>
 
@@ -17,22 +17,33 @@
         <h1 style="font-family: 'Playfair Display', serif; font-size: 32px; margin: 0 0 10px;">{{ product.title }}</h1>
         <p style="font-size: 24px; color: #d4af37; margin-bottom: 30px;">{{ product.base_price }} BYN</p>
 
-        <div style="border-top: 1px solid #eee; padding-top: 20px;">
+        <div style="border-top: 1px solid #eee; padding-top: 20px; margin-bottom: 30px;">
             <p style="font-size: 14px; margin-bottom: 10px;"><strong>Материал:</strong> {{ product.get_material_display }}</p>
             <p style="font-size: 14px; margin-bottom: 10px;"><strong>Проба:</strong> {{ product.sample }}</p>
             <p style="font-size: 14px; margin-bottom: 10px;"><strong>Вид вставки:</strong> {{ product.get_insertion_display }}</p>
             <p style="font-size: 14px; line-height: 1.8; color: #666;">{{ product.description }}</p>
         </div>
 
-<!--        <button style="margin-top: 40px; width: 100%; padding: 15px; background: #1a1a1a; color: white; border: none; text-transform: uppercase; letter-spacing: 2px; cursor: pointer;">-->
-<!--            В корзину-->
-<!--        </button>-->
-        <a href="{% url 'add_to_cart' product.id %}"
-       style="display: block; text-align: center; padding: 10px; background: #d4af37; color: #fff; text-decoration: none; font-size: 12px; text-transform: uppercase; margin-top: 10px; transition: 0.3s;"
-       onmouseover="this.style.background='#b8962d'"
-       onmouseout="this.style.background='#d4af37'">
-        В корзину
-    </a>
+        <form action="{% url 'add_to_cart' product.id %}" method="post">
+            {% csrf_token %}
+
+            <label style="display: block; font-size: 12px; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px;">Выберите размер:</label>
+            <select name="variant_id" required style="width: 100%; padding: 12px; border: 1px solid #eee; margin-bottom: 20px; font-family: 'Montserrat', sans-serif; outline: none;">
+                <option value="" disabled selected>Нажмите, чтобы выбрать</option>
+                {% for variant in product.variants.all %}
+                    <option value="{{ variant.id }}" {% if variant.stock <= 0 %}disabled{% endif %}>
+                        Размер: {{ variant.size }} {% if variant.stock <= 0 %}(Нет в наличии){% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit"
+                style="width: 100%; padding: 15px; background: #1a1a1a; color: #fff; border: none; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; cursor: pointer; transition: 0.3s;"
+                onmouseover="this.style.background='#333'"
+                onmouseout="this.style.background='#1a1a1a'">
+                Добавить в корзину
+            </button>
+        </form>
     </div>
 </div>
 {% endblock %}
