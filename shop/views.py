@@ -8,7 +8,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 
-
 def home(request):
     products = Product.objects.all()
     return render(request, 'shop/index.html', {'products': products})
@@ -16,7 +15,19 @@ def home(request):
 
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
-    return render(request, 'shop/product_detail.html', {'product': product})
+
+    is_in_favorites = False
+    if request.user.is_authenticated:
+        is_in_favorites = Favorite.objects.filter(user=request.user, product=product).exists()
+    else:
+        session_id = request.session.session_key
+        if session_id:
+            is_in_favorites = Favorite.objects.filter(session_key=session_id, product=product).exists()
+
+    return render(request, 'shop/product_detail.html', {
+        'product': product,
+        'is_in_favorites': is_in_favorites
+    })
 
 
 def catalog(request, category_slug=None):
@@ -77,31 +88,37 @@ def register(request):
         pass1 = request.POST.get('pass1')
         pass2 = request.POST.get('pass2')
 
+        context = {
+            'username': u_name,
+            'email': email,
+            'full_name': p_name,
+        }
+
         if len(pass1) < 8:
-            messages.error(request, "Пароль должен содержать минимум 8 символов")
-            return redirect('register')
+            context['error_message'] = "Пароль должен содержать минимум 8 символов"
+            return render(request, 'shop/register.html', context)
 
         if pass1.isdigit():
-            messages.error(request, "Пароль не может состоять только из цифр")
-            return redirect('register')
+            context['error_message'] = "Пароль не может состоять только из цифр"
+            return render(request, 'shop/register.html', context)
 
         if pass1 != pass2:
-            messages.error(request, "Пароли не совпадают")
-            return redirect('register')
+            context['error_message'] = "Пароли не совпадают"
+            return render(request, 'shop/register.html', context)
 
         if User.objects.filter(username=u_name).exists():
-            messages.error(request, "Такой логин уже занят")
-            return redirect('register')
+            context['error_message'] = "Такой логин уже занят"
+            return render(request, 'shop/register.html', context)
 
         user = User.objects.create_user(username=u_name, email=email, password=pass1)
 
-        # после сигнала
+        # После сигнала профиль создается автоматически
         profile = user.profile
         profile.full_name = p_name
         profile.save()
 
+        merge_carts(request, user)
         login(request, user)
-        merge_carts(request, user)  # объединяем корзину сразу
         return redirect('catalog')
 
     return render(request, 'shop/register.html')
@@ -112,43 +129,89 @@ def user_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        # проверка
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
+            merge_carts(request, user)
             login(request, user)
-            merge_carts(request, user) # склеиваем данные до входа + после входа
             return redirect('home')
         else:
             messages.error(request, "Неверный логин или пароль")
 
     return render(request, 'shop/login.html')
 
+
 def user_logout(request):
     logout(request)
     return redirect('home')
 
+
 @login_required(login_url='login')
 def profile_view(request):
-    return render(request, 'shop/profile.html')
+    user = request.user
+    profile = user.profile
 
-# корзина и заказы
+    if request.method == 'POST':
+        full_name = request.POST.get('full_name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        address = request.POST.get('address')
+
+        if not full_name or not email:
+            messages.error(request, "Поля Имя и Email должны быть заполнены")
+            return redirect('profile')
+
+        user.email = email
+        user.save()
+
+        profile.full_name = full_name
+        profile.phone = phone
+        profile.address = address
+        profile.save()
+
+        messages.success(request, "Профиль успешно обновлен!")
+        return redirect('profile')
+
+    orders = Order.objects.filter(user=user).order_by('-id')
+
+    return render(request, 'shop/profile.html', {
+        'user': user,
+        'profile': profile,
+        'orders': orders
+    })
+
 
 def merge_carts(request, user):
-    # переносит товары из анонимной сессии в аккаунт пользователя
     session_key = request.session.session_key
-    if session_key:
-        guest_items = Cart.objects.filter(session_key=session_key)
-        for item in guest_items:
-            user_item = Cart.objects.filter(user=user, product=item.product).first()
-            if user_item:
-                user_item.quantity += item.quantity
-                user_item.save()
-                item.delete()
-            else:
-                item.user = user
-                item.session_key = None
-                item.save()
+
+    if not session_key:
+        print("Предупреждение: session_key не найден в текущем запросе!")
+        return
+
+    guest_items = Cart.objects.filter(session_key=session_key)
+
+    for item in guest_items:
+        user_item = Cart.objects.filter(user=user, product=item.product, variant=item.variant).first()
+        if user_item:
+            user_item.quantity += item.quantity
+            user_item.save()
+            item.delete()
+        else:
+            item.user = user
+            item.session_key = None
+            item.save()
+
+    guest_favorites = Favorite.objects.filter(session_key=session_key)
+
+    for fav in guest_favorites:
+        user_fav_exists = Favorite.objects.filter(user=user, product=fav.product).exists()
+        if user_fav_exists:
+            fav.delete()
+        else:
+            fav.user = user
+            fav.session_key = None
+            fav.save()
+
 
 
 def add_to_cart(request, product_id):
@@ -156,6 +219,8 @@ def add_to_cart(request, product_id):
         request.session.create()
 
     session_id = request.session.session_key
+    request.session.modified = True
+
     product = get_object_or_404(Product, id=product_id)
 
     variant_id = request.POST.get('variant_id')
@@ -220,7 +285,6 @@ def checkout(request):
     if request.method == 'POST':
         total_price = sum(item.product.base_price * item.quantity for item in cart_items)
 
-        # проверка остатков
         for item in cart_items:
             if not item.variant or item.variant.stock < item.quantity:
                 messages.error(request, f"Товар {item.product.title} (размер {item.variant.size}) закончился")
@@ -236,7 +300,6 @@ def checkout(request):
 
         for item in cart_items:
             variant = item.variant
-
             variant.stock -= item.quantity
             variant.save()
 
@@ -249,10 +312,13 @@ def checkout(request):
 
         cart_items.delete()
 
+        return render(request, 'shop/catalog.html')
+
     return render(request, 'shop/checkout.html', {
         'cart_items': cart_items,
         'profile': user_profile
     })
+
 
 def remove_from_cart(request, item_id):
     cart_item = get_object_or_404(Cart, id=item_id)
@@ -261,12 +327,48 @@ def remove_from_cart(request, item_id):
     return redirect('cart')
 
 
+def toggle_favorite(request, product_id):
+    if not request.session.session_key:
+        request.session.create()
+
+    session_id = request.session.session_key
+    request.session.modified = True
+
+    product = get_object_or_404(Product, id=product_id)
+    user = request.user if request.user.is_authenticated else None
+
+    if user:
+        favorite_item = Favorite.objects.filter(user=user, product=product)
+    else:
+        favorite_item = Favorite.objects.filter(session_key=session_id, product=product)
+
+    if favorite_item.exists():
+        favorite_item.delete()
+        messages.error(request, f"Товар {product.title} удален из избранного")
+    else:
+        if user:
+            Favorite.objects.create(user=user, product=product)
+        else:
+            Favorite.objects.create(session_key=session_id, product=product)
+        messages.success(request, f"Товар {product.title} добавлен в избранное")
+
+    return redirect(request.META.get('HTTP_REFERER', 'catalog'))
+
 
 def favorites(request):
-    return render(request, 'shop/favorites.html')
+    if request.user.is_authenticated:
+        favorite_items = Favorite.objects.filter(user=request.user)
+    else:
+        session_id = request.session.session_key
+        favorite_items = Favorite.objects.filter(session_key=session_id) if session_id else []
+
+    products = [item.product for item in favorite_items]
+    return render(request, 'shop/favorites.html', {'products': products})
+
 
 def about(request):
     return render(request, 'shop/about.html')
+
 
 def contacts(request):
     return render(request, 'shop/contacts.html')

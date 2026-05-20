@@ -4,9 +4,9 @@
 <div style="display: flex; gap: 80px; margin-top: 40px; align-items: start;">
     <div style="flex: 1; background: #f9f9f9; height: 500px; display: flex; align-items: center; justify-content: center;">
         {% if product.image %}
-            <img src="{{ product.image.url }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+        <img src="{{ product.image.url }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
         {% else %}
-            <span style="color: #ccc; font-family: 'Playfair Display';">MY_SHOP</span>
+        <span style="color: #ccc; font-family: 'Playfair Display';">MY_SHOP</span>
         {% endif %}
     </div>
 
@@ -27,23 +27,28 @@
         <form action="{% url 'add_to_cart' product.id %}" method="post">
             {% csrf_token %}
 
-            <label style="display: block; font-size: 12px; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px;">Выберите размер:</label>
-            <select name="variant_id" required style="width: 100%; padding: 12px; border: 1px solid #eee; margin-bottom: 20px; font-family: 'Montserrat', sans-serif; outline: none;">
-                <option value="" disabled selected>Нажмите, чтобы выбрать</option>
+            <label style="display: block; font-size: 12px; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px;">
+                Выберите размер:
+            </label>
+            <select name="variant_id" required style="width: 100%; padding: 10px; border: 1px solid #eee; margin-bottom: 20px;">
                 {% for variant in product.variants.all %}
-                    <option value="{{ variant.id }}" {% if variant.stock <= 0 %}disabled{% endif %}>
-                        Размер: {{ variant.size }} {% if variant.stock <= 0 %}(Нет в наличии){% endif %}
-                    </option>
+                <option value="{{ variant.id }}">{{ variant.size }}</option>
                 {% endfor %}
             </select>
 
-            <button type="submit"
-                style="width: 100%; padding: 15px; background: #1a1a1a; color: #fff; border: none; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; cursor: pointer; transition: 0.3s;"
-                onmouseover="this.style.background='#333'"
-                onmouseout="this.style.background='#1a1a1a'">
+            <button type="submit" style="width: 100%; padding: 15px; background: #1a1a1a; color: #fff; border: none; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-bottom: 15px;">
                 Добавить в корзину
             </button>
-        </form>
+        </form> <a href="{% url 'toggle_favorite' product.id %}"
+           style="display: block; text-align: center; padding: 12px; border: 1px solid #1a1a1a; color: #1a1a1a; text-decoration: none; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;"
+           onmouseover="this.style.background='#f5f5f5';"
+           onmouseout="this.style.background='transparent';">
+            {% if is_in_favorites %}
+            Удалить из избранного
+            {% else %}
+            В избранное
+            {% endif %}
+        </a>
     </div>
 </div>
 {% endblock %}
